@@ -1,1 +1,1 @@
-This is a ML project where we'll create a model which will predict whether the a person will survive or not on their attributes
+This is an ML project where we'll create a model which will predict whether the a person will survive or not on their attributes
