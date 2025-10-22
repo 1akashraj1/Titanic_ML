@@ -12,6 +12,7 @@ build/
 develop-eggs/
 dist/
 downloads/
+mylogs/
 eggs/
 .eggs/
 lib/
@@ -74,6 +75,9 @@ docs/_build/
 # PyBuilder
 .pybuilder/
 target/
+
+#markdowns
+data_flow.md
 
 # Jupyter Notebook
 .ipynb_checkpoints
