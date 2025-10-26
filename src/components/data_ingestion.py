@@ -2,8 +2,10 @@ import os
 import sys
 from src.logging import logger
 from src.exception import CustomException
+from src.utils import load_dataset
 from dataclasses import dataclass
 import pandas as pd
+from src.components.data_preprocessing import DataPreprocessor
 
 @dataclass
 class DataIngestionConfig:
@@ -20,8 +22,8 @@ class DataIngestion:
         logger('Started the data ingestion')
 
         try:
-            train_dataset = pd.read_csv('dataset\\train.csv')
-            test_dataset = pd.read_csv('dataset\\test.csv')
+            train_dataset, test_dataset = load_dataset()
+
 
             logger('Creating artifacts folder')
             os.makedirs(os.path.dirname(self.data_ingestion.train_data_path),exist_ok=True)
@@ -47,6 +49,9 @@ class DataIngestion:
 
 if __name__ == '__main__':
     my_obj = DataIngestion()
+    my_data_preprocessor_obj = DataPreprocessor()
 
     train_data_path, test_data_path = my_obj.my_data_ingestion()
-    print(test_data_path, train_data_path)
+
+    X_train, Y_train, Xtest = my_data_preprocessor_obj.data_preprocessing
+    
