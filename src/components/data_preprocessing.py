@@ -5,17 +5,18 @@ import sys
 from src.exception import CustomException
 from src.logging import logger
 from src.utils import save_object
+from model_trainer import ModelTrainer
 from dataclasses import dataclass
 
 from pipeline import ColumnImputation
 
 
 @dataclass
-class DataPreprocessingConfig():
+class DataPreprocessingConfig:
     preprocessor_obj_file_path = os.path.join('artifacts', 'preprocessor.pkl')
 
 
-class DataPreprocessor():
+class DataPreprocessor:
     def __init__(self):
         self.data_preprocessor_config = DataPreprocessingConfig()
 
@@ -23,13 +24,13 @@ class DataPreprocessor():
     def data_preprocessing(self):
         try:
             logger('Loading the training and testing dataset')
-            train_data, X_test_data = pd.read_csv('dataset\\train.csv'), pd.read_csv('dataset\\test.csv')
+            train_data, X_test_data = pd.read_csv('artifacts\\train.csv'), pd.read_csv('artifacts\\test.csv')
             
-            
+
             logger('Splitting the train and test dataset')
-            X_train_data = pd.concat([train_data.iloc[:,0], train_data.iloc[:,2:]])
+            X_train_data = pd.concat([train_data.iloc[:,0], train_data.iloc[:,2:]],axis=1)
             Y_train_data = train_data.iloc[:,1]
-            
+
             logger('Merging Parch and SibSp cols')
             # Training data
             X_train_data['Family'] = (X_train_data['SibSp'] + X_train_data['Parch'])
@@ -42,12 +43,13 @@ class DataPreprocessor():
 
             logger('Splitting Cabin columns and extracting copartment and the room num')
             # Training dataset
-            X_train_data['Room_num'] = X_train_data['Cabin'].str.strip().str.extract('(\d+)')
-            X_train_data['Compartment'] = X_train_data['Cabin'].str.strip().str.extract("([a-zA-Z]+)", expand=False)
+            # X_train_data['Room_num'] = X_train_data['Cabin'].str.strip().str.extract('(\d+)')
+            # X_train_data['Compartment'] = X_train_data['Cabin'].str.strip().str.extract("([a-zA-Z]+)", expand=False)
 
-            # Testing dataset
-            X_test_data['Room_num'] = X_test_data['Cabin'].str.strip().str.extract('(\d+)')
-            X_test_data['Compartment'] = X_test_data['Cabin'].str.strip().str.extract("([a-zA-Z]+)", expand=False)
+
+            # # Testing dataset
+            # X_test_data['Room_num'] = X_test_data['Cabin'].str.strip().str.extract('(\d+)')
+            # X_test_data['Compartment'] = X_test_data['Cabin'].str.strip().str.extract("([a-zA-Z]+)", expand=False)
 
             logger('Dropping unnecessary columns')
             X_train_data.drop(['SibSp','Parch','Cabin','Name','Ticket'],axis = 1, inplace = True)
@@ -57,6 +59,7 @@ class DataPreprocessor():
 
             logger('Imputing the missing values')
             column_imputer_obj = ColumnImputation()
+            missing_value_imputer = column_imputer_obj.missing_value_imputer()
             preprocessor = column_imputer_obj.preprocessing()
 
 
@@ -70,8 +73,6 @@ class DataPreprocessor():
                 preprocessor
 
             )
-
-            
             return (
                 X_train_transformed, Y_train_data, X_test_trasformed
             )
@@ -88,4 +89,8 @@ class DataPreprocessor():
 if __name__ == '__main__':
     my_data_preprocessor_obj = DataPreprocessor()
 
-    X_train, Y_train, Xtest = my_data_preprocessor_obj.data_preprocessing()
+    X_train, Y_train, X_test = my_data_preprocessor_obj.data_preprocessing()
+
+    model_trainer = ModelTrainer()
+    score,model = model_trainer.model_training(X_train, Y_train, X_test)
+    print(score,model)

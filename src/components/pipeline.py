@@ -22,7 +22,7 @@ class ColumnImputation:
         """
         try:
             transformers = [
-                ("age_imputer", SimpleImputer(strategy="mean"), ["Age"]),
+                ("age_imputer", SimpleImputer(strategy="mean"),["Age"]),
                 ("embarked_imputer", SimpleImputer(strategy="most_frequent"), ["Embarked"]),
                 (
                     "cabin_imputer",
@@ -43,8 +43,8 @@ class ColumnImputation:
         """
         try:
             # columns to treat as categorical / numeric - adjust if your dataset differs
-            categorical_cols = ["Compartment", "Family", "Embarked", "Sex"]
-            numeric_cols = ["Age"]
+            categorical_cols = ["Family", "Embarked", "Sex"]
+            numeric_cols = ["Age","Fare"]
 
             num_pipeline = Pipeline(steps=[
                 ("imputer", SimpleImputer(strategy="mean")),
@@ -53,7 +53,7 @@ class ColumnImputation:
 
             cat_pipeline = Pipeline(steps=[
                 ("imputer", SimpleImputer(strategy="most_frequent")),
-                ("onehot", OneHotEncoder(handle_unknown="ignore"))
+                ("onehot", OneHotEncoder(handle_unknown="ignore",drop='first'))
             ])
 
             preprocessor = ColumnTransformer(transformers=[
